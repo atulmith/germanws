@@ -1,0 +1,323 @@
+<!doctype html>
+
+
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <!-- DevExtreme dependencies -->
+<script type="text/javascript" src="https://ajax.aspnetcdn.com/ajax/jquery/jquery-3.1.0.min.js"></script>
+<!-- DevExtreme themes -->
+<link rel="stylesheet" type="text/css" href="https://cdn3.devexpress.com/jslib/17.2.3/css/dx.common.css" />
+<link rel="stylesheet" type="text/css" href="https://cdn3.devexpress.com/jslib/17.2.3/css/dx.light.css" />
+<!-- A DevExtreme library -->
+<script type="text/javascript" src="https://cdn3.devexpress.com/jslib/17.2.3/js/dx.all.js"></script>
+<!-- <script type="text/javascript" src="https://cdn3.devexpress.com/jslib/17.2.3/js/dx.mobile.js"></script> -->
+<!-- <script type="text/javascript" src="https://cdn3.devexpress.com/jslib/17.2.3/js/dx.web.js"></script> -->
+<!-- <script type="text/javascript" src="https://cdn3.devexpress.com/jslib/17.2.3/js/dx.viz.js"></script> -->
+<!-- <script type="text/javascript" src="https://cdn3.devexpress.com/jslib/17.2.3/js/dx.viz-web.js"></script> -->
+
+<!-- <script type="text/javascript" src="mylogic2.js"></script> -->
+
+<script type="text/javascript">
+$(document).ready(function(){
+
+    function doLogicForTextBox(parentobj){
+        var tempobj=parentobj.properties;
+        var obj=tempobj;
+        
+        var control=$("<input />");
+
+        var myproperties=tempobj;
+        var myid=parentobj.id;
+        
+        control.attr('id',myid);
+        // var simple = this.renderer.listen(this.myButton.nativeElement, 'click', myfunction);    
+    
+        var w=myproperties.width;
+        var h=myproperties.height;
+         
+        //to set the width and height as a style retrieved from properties.
+        control.height(h);
+        control.width(w);
+    
+        
+        
+        Object.keys(myproperties).forEach(key=>{
+          var obj={};
+          var fieldname=key;
+          var fieldvalue=myproperties[key];
+           
+          if(fieldname.startsWith("on")==false && fieldvalue){
+              control.attr(fieldname,fieldvalue);
+          }
+          
+          if(fieldname.startsWith("on")){
+            var myfunction=new Function('e',fieldvalue);
+            var myevent=fieldname.slice(2,fieldname.length);
+            myevent=myevent.charAt(0).toLowerCase()+myevent.slice(1);
+            console.log("myevent="+myevent);
+            control.on(myevent, myfunction); 
+            
+          }
+        });
+        return control;
+      }
+
+    function  doLogicForButton(parentobj,rd){
+        var tempobj=parentobj.properties;
+        var obj=tempobj;
+        
+        var myproperties=obj;
+        var myid=parentobj.id;
+    
+        
+        var control=$('<button> </button>');
+      
+        // alert('position='+JSON.stringify(myinstance.position));
+        control.attr('id',myid);
+        
+        // var simple = this.renderer.listen(this.myButton.nativeElement, 'click', myfunction);    
+    
+        if(myproperties['style']){
+           control.attr("style",myproperties['style']) 
+        //   rd.setAttribute(control,"style",myproperties['style']);
+        }
+    
+        var w=myproperties.width;
+        var h=myproperties.height;
+      
+        control.height(h);
+        control.width(w);
+        // rd.setStyle(control, 'height', h);
+        // rd.setStyle(control, 'width', w);
+        
+        //to set the innerHTML attribute to show text ijn button
+        control[0].innerHTML=myproperties['text'];
+    
+        Object.keys(myproperties).forEach(key=>{
+          var obj={};
+          var fieldname=key;
+          var fieldvalue=myproperties[key];
+          
+          
+          if(fieldname!="style" && fieldname.startsWith("on")==false){
+            control.attr(fieldname,fieldvalue);
+            // rd.setAttribute(control,fieldname,fieldvalue);
+            
+          }
+          
+          if(fieldname.startsWith("on")){
+            var myfunction=new Function('e',fieldvalue);
+            var myevent=fieldname.slice(2,fieldname.length);
+            myevent=myevent.charAt(0).toLowerCase()+myevent.slice(1);
+            // console.log("myevent="+myevent);
+            // var func=rd.listen(control, myevent, myfunction); 
+            control.on(myevent,myfunction);
+          }
+        });
+    
+        return control;
+
+        
+
+      }
+    function doLogicForDxDataGrid(parentobj){
+        var tempobj=parentobj.properties;
+        var obj=tempobj;
+        var SERVICE_URL="http://localhost:8080/webpageslogic/";
+
+        var mydataSource = new DevExpress.data.CustomStore({
+            load: function(loadOptions) {
+                return $.post(SERVICE_URL+"genericselect",{"input0":"dummy"});
+            },
+            insert: function(values) {
+                return $.post(SERVICE_URL+"genericcreate/", {"input0":JSON.stringify(values)});
+            },
+            update: function(key, values) {
+                return $.post(SERVICE_URL + "genericupdate/" ,{"input01":JSON.stringify(values),"input02":key._id});
+            },
+            remove: function(values) {
+                return $.post(SERVICE_URL+"genericdelete/", {"input01":values._id});
+            }
+        });
+       //= this.loadCustomDataSource();
+        // mydataSource.sort("City");
+        
+      
+    
+            var myproperties=tempobj;
+            var myid=parentobj.id;
+
+            var dxdatagrid=$('<div>').dxDataGrid({
+                editing:{
+                    mode:"form",
+                    allowUpdating:true,
+                    allowAdding:true,
+                    allowDeleting:true
+                },
+                showBorders:true,
+                showRowLines:true,
+                rowAlternationEnabled:true,
+            });
+
+            var control=dxdatagrid.dxDataGrid("instance");      
+        
+            dxdatagrid.attr('id',myid);
+    
+            myproperties.dataSource=mydataSource;//this.localmodel;
+            
+            
+            var w=myproperties.width;
+            var h=myproperties.height;
+             
+            Object.keys(myproperties).forEach(key=>{
+              var obj={};
+              var fieldname=key;
+              var fieldvalue=myproperties[key];
+              
+            
+        
+              control.option(fieldname,fieldvalue); 
+              if(fieldname.startsWith("on")){
+                var myfunction=new Function('e',fieldvalue);
+                var myevent=fieldname.slice(2,fieldname.length);
+                myevent=myevent.charAt(0).toLowerCase()+myevent.slice(1);
+                console.log("myevent="+myevent);
+                
+                control.on(myevent,myfunction); 
+                
+              }
+            });
+        
+           control.repaint();//updateDimensions();
+     
+           return dxdatagrid;
+        
+      }
+
+    function doLogicForDxButton(parentobj){
+    var tempobj=parentobj.properties;
+    var obj=tempobj;
+    
+    var myproperties=tempobj;
+    var myid=parentobj.id;
+    var dxbutton=$('<div>').dxButton({});     
+    
+    var control=dxbutton.dxButton("instance")
+    
+    $(control).attr('id',myid);
+    
+    var w=myproperties.width;
+    var h=myproperties.height;
+    
+    
+    Object.keys(myproperties).forEach(key=>{
+    // for(var i=0;i<myproperties.length;i++){
+      // var key=myproperties[i];       
+      var obj={};
+      var fieldname=key;
+      var fieldvalue=myproperties[key];
+      
+    
+
+      control.option(fieldname,fieldvalue);
+      if(fieldname.startsWith("on")){
+        var myfunction=new Function('e',fieldvalue);
+        var myevent=fieldname.slice(2,fieldname.length);
+        myevent=myevent.charAt(0).toLowerCase()+myevent.slice(1);
+        console.log("myevent="+myevent,myfunction);
+        
+        control.on(myevent,myfunction); 
+        
+      }
+    });
+    return dxbutton;
+  }
+    function doPreviewForms(str){
+        
+
+        alert(str);
+        var listofinstancesarr=str;
+        // var myhtmlform=JSON.parse(str);
+        // var listofinstancesarr=JSON.parse(myhtmlform.jsonofhtml);
+        // var listofinstancesarr=myhtmlform.jsonofhtml;
+        var previewcomponenthere=$('#content');
+        var rd=null;    
+        previewcomponenthere.width("100%");
+        previewcomponenthere.height("100%");
+        previewcomponenthere.css("position","absolute");
+
+        for(var i=0;i<listofinstancesarr.length;i++){
+            var a=listofinstancesarr[i];
+            if(a.type=="button"){
+                var ctrl=doLogicForButton(a,rd);
+                previewcomponenthere.append(ctrl);
+                ctrl.css('left', a.position.x+'px');
+                ctrl.css('top',  a.position.y+'px');
+                ctrl.css('position','absolute');
+            }
+            if(a.type=="textbox"){
+                var ctrl=doLogicForTextBox(a);
+                previewcomponenthere.append(ctrl);
+                ctrl.css('left', a.position.x+'px');
+                ctrl.css('top',  a.position.y+'px');
+                ctrl.css('position','absolute');
+            }
+            if(a.type=="dx-button"){
+                var ctrl=doLogicForDxButton(a);
+                previewcomponenthere.append(ctrl);
+                ctrl.css('left', a.position.x+'px');
+                ctrl.css('top',  a.position.y+'px');
+                ctrl.css('position','absolute');
+            }
+            if(a.type=="dx-datagrid"){
+                var ctrl=doLogicForDxDataGrid(a);
+                previewcomponenthere.append(ctrl);
+                ctrl.css('left', a.position.x+'px');
+                ctrl.css('top',  a.position.y+'px');
+                ctrl.css('position','absolute');
+            }
+
+        }
+         
+    }
+
+    var myjson=' { '+
+    ' "displayname": "mydxbutton", '+
+    ' "htmlfilekeyname": "mydxbutton", '+
+    ' "jsonofhtml": '+'[{"id":"98vrq","type":"dx-button","position":{"x":90,"y":118},"properties":{"width":"200px","height":"50px","text":"DX Button","disabled":false,"hint":"","type":"success","targetform":"","targetaction":"","onClick":"alert(\\"HI\\");","onDisposing":"","onInitialized":"","onOptionChanged":""},"postionproperties":{"isparentbox":"false"}}], '+
+    ' "user": "client" '+
+    '}';
+
+    var myjsonreal=' { '+
+    ' "displayname": "mydxbutton", '+
+    ' "htmlfilekeyname": "mydxbutton", '+
+    ' "jsonofhtml": "[{\\"id\\":\\"98vrq\\",\\"type\\":\\"dx-button\\",\\"position\\":{\\"x\\":90,\\"y\\":118},\\"properties\\":{\\"width\\":\\"200px\\",\\"height\\":\\"50px\\",\\"text\\":\\"DX Button\\",\\"disabled\\":false,\\"hint\\":\\"\\",\\"type\\":\\"success\\",\\"targetform\\":\\"\\",\\"targetaction\\":\\"\\",\\"onClick\\":\\"alert(\'hi\'); \\",\\"onDisposing\\":\\"\\",\\"onInitialized\\":\\"\\",\\"onOptionChanged\\":\\"\\"},\\"postionproperties\\":{\\"isparentbox\\":false}}]", '+
+    ' "user": "client" '+
+    '}';
+
+    var mygridjson='{'+
+    ' "displayname": "mygrid", '+
+    ' "htmlfilekeyname": "mygrid", '+
+    ' "jsonofhtml": [{"id":"ye44j","type":"button","position":{"x":66,"y":64},"properties":{"autofocus":false,"formaction":"","formenctype":"","formmethod":"","formnovalidate":false,"formtarget":"","name":"","type":"","text":"Button","value":"Button","style":"","width":"100px","height":"45px","onclick":"","oncontextmenu":"","ondblclick":"","onmousedown":"","onmouseenter":"","onmouseleave":"","onmousemove":"","onmouseover":"","onmouseout":"","onmouseup":"","onkeydown":"","onkeypress":"","onkeyup":""},"postionproperties":{"isparentbox":false}},{"id":"0q7t2","type":"dx-datagrid","position":{"x":45,"y":142},"properties":{"width":"500px","height":"400px","dataSource":"","onAdaptiveDetailRowPreparing":"","onCellClick":"","onCellHoverChanged":"","onCellPrepared":"","onContentReady":"","onContextMenuPreparing":"","onDataErrorOccurred":"","onDisposing":"","onEditingStart":"","onEditorPrepared":"","onEditorPreparing":"","onExported":"","onExporting":"","onFileSaving":"","onInitialized":"","onInitNewRow":"","onKeyDown":"","onOptionChanged":"","onRowClick":"","onRowCollapsed":"","onRowCollapsing":"","onRowExpanded":"","onRowExpanding":"","onRowInserted":"","onRowInserting":"","onRowPrepared":"","onRowRemoved":"","onRowRemoving":"","onRowUpdated":"","onRowUpdating":"","onRowValidating":"","onSelectionChanged":"","onToolbarPreparing":""},"postionproperties":{"isparentbox":false}}],'+
+    ' "user": "client" '+
+    '}';
+    console.log(myjsonreal);
+    var finalData = myjsonreal.replace(/\\/g, '');
+    console.log(finalData);
+    //doPreviewForms(myjsonreal);
+    var datafromclient=;
+    doPreviewForms(datafromclient);//mygridjson);
+    
+});
+</script>
+
+</head>
+<body  class="dx-viewport">
+
+        <!-- <div id="scrollViewContainer"> -->
+                <div id="content"></div>
+        <!-- </div> -->
+        
+</body>
+</html>

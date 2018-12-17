@@ -1,0 +1,32 @@
+{
+  "name": "AutomationWS",
+  "version": "1.0.0",
+  "description": "Nodejs App for Automation WS Rest Service",
+  "main": "lib/index",
+  "types": "lib/index",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "nodejs",
+    "atul"
+  ],
+  "author": "atul",
+  "license": "ISC",
+  "dependencies": {
+    "babel-polyfill": "^6.26.0",
+    "body-parser": "^1.17.0",
+    "core-js": "^2.4.1",
+    "cors": "^2.8.1",
+    "ejs": "^2.5.7",
+    "express": "^4.15.0",
+    "express-fileupload": "^0.1.2",
+    "mongodb": "^2.2.26"
+  },
+  "devDependencies": {
+    "@types/node": "^8.0.53",
+    "nodemon": "^1.12.1",
+    "ts-node": "^3.3.0",
+    "typescript": "^2.6.1"
+  }
+}
